@@ -1,0 +1,7 @@
+requests
+black
+isort
+flake8
+mypy
+python-dotenv
+alive-progress
