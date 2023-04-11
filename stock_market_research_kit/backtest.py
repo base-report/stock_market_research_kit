@@ -31,9 +31,9 @@ def backtest(daily_candles):
     # Array to store trades
     trades = []
 
-    # Current combo being formed
-    current_combo = None
-    trade = None
+    # Current combos being formed
+    current_combos = []
+    active_trades = []
 
     for i in range(len(daily_candles)):
         if i <= exit_sma_days:
@@ -41,48 +41,51 @@ def backtest(daily_candles):
 
         new_candle = daily_candles[i - 1]
 
-        if not current_combo or not trade:
-            # Check for entry
-            prev_candle = daily_candles[i - 2]
-            prior_range_candles = daily_candles[i - (prior_move_days + 2) : i - 1]
-            possible_consolidation_candles = daily_candles[
-                i - (max_consolidation_days + 2) : i - 1
-            ]
-            entry = look_for_entry(
-                prev_candle,
-                new_candle,
-                prior_range_candles,
-                possible_consolidation_candles,
-            )
+        # Check for entry
+        prev_candle = daily_candles[i - 2]
+        prior_range_candles = daily_candles[i - (prior_move_days + 2) : i - 1]
+        possible_consolidation_candles = daily_candles[
+            i - (max_consolidation_days + 2) : i - 1
+        ]
+        entry = look_for_entry(
+            prev_candle,
+            new_candle,
+            prior_range_candles,
+            possible_consolidation_candles,
+        )
 
-            # If entry, start a new combo
-            if entry:
-                current_combo = [new_candle]
-                trade = Trade()
-                trade.entry = entry
-        else:
+        # If entry, start a new combo
+        if entry:
+            current_combo = [new_candle]
+            trade = Trade()
+            trade.entry = entry
+
+            current_combos.append(current_combo)
+            active_trades.append(trade)
+
+        for idx, trade in enumerate(active_trades):
+            if new_candle[5] == trade.entry["date"]:
+                continue
+
             # Add to current combo
-            current_combo.append(new_candle)
+            current_combos[idx].append(new_candle)
 
             # Check for partial sell
-            current_day = len(current_combo)
-            partial_target = look_for_partial_target(trade, current_day, new_candle)
+            partial_target = look_for_partial_target(trade, current_combos[idx])
             if partial_target:
                 trade.partial_target = partial_target
 
             # Check for exit
             end_sma = calculate_sma(daily_candles[i - exit_sma_days : i])
-            exit = look_for_exit(trade, current_combo, end_sma)
+            exit = look_for_exit(trade, current_combos[idx], end_sma)
 
             if exit:
                 trade.exit = exit
                 trades.append(trade)
 
-                # Reset the current combo
-                current_combo = None
-
-                # Reset the trade
-                trade = None
+                # Remove the trade from active trades
+                active_trades.pop(idx)
+                current_combos.pop(idx)
 
     return trades
 
@@ -138,9 +141,12 @@ def look_for_entry(
         return None
 
 
-def look_for_partial_target(trade, current_day, new_candle):
+def look_for_partial_target(trade, current_combo):
     # Make partial sell between partial_sell_day_start and partial_sell_day_end
     # if sell target is met, sell at that price, otherwise sell at the close of day 5
+    current_day = len(current_combo)
+    new_candle = current_combo[-1]
+
     if partial_sell_day_start <= current_day <= partial_sell_day_end:
         if trade.partial_target:
             return None
