@@ -71,9 +71,9 @@ def backtest(daily_candles):
             current_combos[idx].append(new_candle)
 
             # Check for partial sell
-            partial_target = look_for_partial_target(trade, current_combos[idx])
-            if partial_target:
-                trade.partial_target = partial_target
+            partial = look_for_partial(trade, current_combos[idx])
+            if partial:
+                trade.partial = partial
 
             # Check for exit
             end_sma = calculate_sma(daily_candles[i - exit_sma_days : i])
@@ -141,14 +141,14 @@ def look_for_entry(
         return None
 
 
-def look_for_partial_target(trade, current_combo):
+def look_for_partial(trade, current_combo):
     # Make partial sell between partial_sell_day_start and partial_sell_day_end
     # if sell target is met, sell at that price, otherwise sell at the close of day 5
     current_day = len(current_combo)
     new_candle = current_combo[-1]
 
     if partial_sell_day_start <= current_day <= partial_sell_day_end:
-        if trade.partial_target:
+        if trade.partial:
             return None
 
         target_price = trade.entry["entry_price"] * (
@@ -173,9 +173,9 @@ def look_for_exit(trade, current_combo, end_sma):
     candle = current_combo[-1]
     hit_initial_stop = candle[2] <= trade.entry["initial_stop"]
     made_partial_sale_and_close_below_entry_price = (
-        trade.partial_target
+        trade.partial
         and candle[3] <= trade.entry["entry_price"]
-        and trade.partial_target["date"] != candle[5]
+        and trade.partial["date"] != candle[5]
     )
     close_below_end_sma = candle[3] <= end_sma
     met_exit_condition = (

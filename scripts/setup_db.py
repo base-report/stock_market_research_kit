@@ -24,6 +24,33 @@ def create_stock_data_table(conn: Connection) -> None:
     conn.commit()
 
 
+def create_trades_table(conn: Connection) -> None:
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS trades (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            symbol TEXT NOT NULL,
+            entry_date TEXT,
+            entry_price REAL,
+            initial_stop REAL,
+            consolidation_days INTEGER,
+            adr20 REAL,
+            volume20 REAL,
+            partial_target_date TEXT,
+            partial_target_price REAL,
+            partial_target_reached INTEGER,
+            exit_date TEXT,
+            exit_price REAL,
+            exit_reason TEXT,
+            days_held INTEGER,
+            FOREIGN KEY (symbol) REFERENCES stock_data (symbol)
+        );
+        """
+    )
+    conn.commit()
+
+
 def main():
     db_name = "stock_market_research.db"
     conn = create_database(db_name)

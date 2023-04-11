@@ -41,7 +41,7 @@ def calculate_adr_pct(candles: List[Tuple[float]], x: int = 20) -> float:
     last_x = candles[-x:]
     if len(candles) == 0:
         return 0
-    adr = sum([d[1] / d[2] for d in last_x]) / len(last_x) - 1
+    adr = sum([d[1] / d[2] if d[2] != 0 else 0 for d in last_x]) / len(last_x) - 1
     return 0 if math.isnan(adr) else adr
 
 
@@ -51,6 +51,9 @@ def get_prior_range(candles, days=20):
     # Convert timestamps to datetime objects
     high_date = datetime.strptime(high_timestamp, "%Y-%m-%d")
     low_date = datetime.strptime(low_timestamp, "%Y-%m-%d")
+
+    if high == 0 or low == 0:
+        return {"range": 0, "high": 0, "low": 0}
 
     if high_date > low_date:
         range_result = (high - low) / low

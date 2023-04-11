@@ -13,8 +13,8 @@ class Trade:
             "volume20": -1,
         }
     )
-    partial_target: dict = None
-    # partial_target: dict = field(
+    partial: dict = None
+    # partial: dict = field(
     #     default_factory=lambda: {
     #         "date": "",
     #         "sell_price": -1,
@@ -29,3 +29,27 @@ class Trade:
             "days_held": -1,
         }
     )
+
+    def to_db_format(self, symbol: str):
+        return {
+            "symbol": symbol,
+            "entry_date": self.entry["date"],
+            "entry_price": self.entry["entry_price"],
+            "initial_stop": self.entry["initial_stop"],
+            "consolidation_days": self.entry["consolidation_days"],
+            "adr20": self.entry["adr20"],
+            "volume20": self.entry["volume20"],
+            "partial_target_date": None
+            if self.partial is None
+            else self.partial["date"],
+            "partial_target_price": None
+            if self.partial is None
+            else self.partial["sell_price"],
+            "partial_target_reached": None
+            if self.partial is None
+            else self.partial["target_reached"],
+            "exit_date": self.exit["date"],
+            "exit_price": self.exit["exit_price"],
+            "exit_reason": self.exit["reason"],
+            "days_held": self.exit["days_held"],
+        }
