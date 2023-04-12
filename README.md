@@ -99,6 +99,16 @@ _This should popoulate the `trades` table. With the default parameters and data 
 
 You should now have data that's ready for analysis!
 
+### Analysis
+
+To analyze data based on different factors like seasonality or ADR%, run the `analyze_trades.py` script:
+
+```bash
+python scripts/analyze_trades.py
+```
+
+This should create a series of CSV files in the `data/csv/` folder.
+
 ## Contributing
 
 Contributions to the Stock Market Research Kit are welcome. If you have ideas for improvements or new features, please open an issue on GitHub or submit a pull request with your proposed changes.
