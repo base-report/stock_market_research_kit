@@ -106,7 +106,7 @@ def look_for_entry(
         return None
 
     is_entry_above_half_range = (
-        new_candle[0]
+        new_candle[3]
         >= prior_range["low"] + (prior_range["high"] - prior_range["low"]) * 0.5
     )
     if not is_entry_above_half_range:
