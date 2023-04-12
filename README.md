@@ -6,6 +6,10 @@ The Stock Market Research Kit is an open-source Python project brought to you by
 
 ## Prerequisites
 
+### Financial Modeling Prep
+
+Currently, the stock data is retrieved from Financial Modeling Prep. As of April 2023, you will need at least the [Professional plan](https://site.financialmodelingprep.com/developer/docs/pricing) to be able to use the bulk endpoint for fetching all profiles.
+
 Before getting started, ensure that you have the following tools installed on your system:
 
 - Conda: A package and environment manager for Python ([https://docs.conda.io/en/latest/miniconda.html](https://docs.conda.io/en/latest/miniconda.html))
@@ -49,33 +53,51 @@ This command installs all the necessary packages specified in the `requirements.
 
 ## Usage
 
-Follow the instructions below to set up the database, download stock data, and download the timeseries data.
+### Set up database
 
-1. Get an API key from Financial Modeling Prep (FMP) and add it to a `.env` file in the root folder of the project:
-
-```
-FMP_API_KEY=your_api_key_here
-```
-
-2. Set up the database by running the `setup_db.py` script:
+Set up the database by running the `setup_db.py` script:
 
 ```bash
 python scripts/setup_db.py
 ```
 
-3. Download the stock data by running the `download_stock_data.py` script:
+### Download stock data
+
+1. Get an API key from Financial Modeling Prep and add it to a `.env` file in the root folder of the project:
+
+```
+FMP_API_KEY=your_api_key_here
+```
+
+2. Download the stock data by running the `download_stock_data.py` script:
 
 ```bash
 python scripts/download_stock_data.py
 ```
 
-4. Download the timeseries data by running the `download_timeseries.py` script:
+_Please note that only the `NASDAQ`, `NYSE`, and `AMEX` exchanges are selected. To target different exchanges, update the `VALID_EXCHANGES` list in the `scripts/download_stock_data.py` file._
+
+3. Download the timeseries data by running the `download_timeseries.py` script:
 
 ```bash
 python scripts/download_timeseries.py
 ```
 
-The SQLite database `stock_market_research.db` will be created and populated with stock data and the timeseries data.
+_Please note the code currently is setup to handle 10 simultaneous downloads. Depending on the Financial Modeling Prep plan you have, you might want to adjust the `max_workers` number in the `scripts/download_timeseries.py` file. With 10 concurrent workers, this step takes ~30 minutes to complete._
+
+The SQLite database `stock_market_research.db` will be created and the `stock_data` table will be populated with stock data and the timeseries data.
+
+### Run backtest
+
+To run the backtest for all of the results we have in the `stock_data` table, run the `run_backtest.py` script:
+
+```bash
+python scripts/run_backtest.py
+```
+
+_This should popoulate the `trades` table. With the default parameters and data as of early April 2023, there should be ~27,000 trades. This step should take ~3-5 minutes (possibly shorter or longer depending on the machine you are running this on)._
+
+You should now have data that's ready for analysis!
 
 ## Contributing
 
