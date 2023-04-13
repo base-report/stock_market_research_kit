@@ -189,13 +189,13 @@ def look_for_exit(trade, current_combo, end_sma):
         reason = "HIT_INITIAL_STOP"
 
         if hit_initial_stop:
-            gap_down = trade.entry["initial_stop"] < candle[0]
+            gap_down = candle[0] < trade.entry["initial_stop"]
             if gap_down:
                 exit_price = candle[0]
             else:
                 exit_price = trade.entry["initial_stop"]
         elif made_partial_sale_and_close_below_entry_price:
-            gap_down = trade.entry["entry_price"] < candle[0]
+            gap_down = candle[0] < trade.entry["entry_price"]
             reason = "TRY_BREAKEVEN_STOP"
             if gap_down:
                 exit_price = candle[0]

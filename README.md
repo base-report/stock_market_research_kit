@@ -97,7 +97,9 @@ python scripts/run_backtest.py
 
 _This should popoulate the `trades` table. With the default parameters and data as of early April 2023, there should be ~27,000 trades. This step should take ~3-5 minutes (possibly shorter or longer depending on the machine you are running this on)._
 
-You should now have data that's ready for analysis!
+### Data Cleaning
+
+After running the backtest, make sure to look for potentiall inaccurate data. For example, as of April 2023, the tickers `CBIO` and `VATE` contain some price data where some `adjClose` (adjusted close) are negative. As of result, any rows associated with these tickers will need to be deleted from the `trades` and `stock_data` tables.
 
 ### Analysis
 
