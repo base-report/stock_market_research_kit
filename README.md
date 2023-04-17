@@ -51,7 +51,7 @@ conda install --file requirements.txt
 
 This command installs all the necessary packages specified in the `requirements.txt` file.
 
-## Usage
+## Basic Usage
 
 ### Set up database
 
@@ -110,6 +110,18 @@ python scripts/analyze_trades.py
 ```
 
 This should create a series of CSV files in the `data/csv/` folder.
+
+## ML Usage
+
+### Plot stock charts
+
+To plot a stock chart of the 200 daily candles prior to each trade entry, run the `plot_stock_charts.py` script:
+
+```bash
+python scripts/plot_stock_charts.py
+```
+
+_Please note that this loads all of the timeseries data into memory and uses 10 background workers to process the trades in parallel. This steps takes ~20 minutes to complete. Feel free to adjust the number of workers in `plot_stock_charts.py` to your machine's capabilities._
 
 ## Contributing
 

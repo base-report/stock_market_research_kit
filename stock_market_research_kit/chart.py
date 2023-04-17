@@ -1,8 +1,12 @@
 import numpy as np
 import pandas as pd
 import mplfinance as mpf
+import matplotlib
 import matplotlib.pyplot as plt
 from PIL import Image
+
+# Use a non-GUI backend to make sure that this can run in background workers
+matplotlib.use("Agg")
 
 
 def plot_and_save_chart(folder_path, symbol, id, candles):

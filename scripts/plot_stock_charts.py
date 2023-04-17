@@ -3,29 +3,29 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-
 import sqlite3
 import json
 from datetime import datetime
-from alive_progress import alive_bar
 from stock_market_research_kit.chart import plot_and_save_chart
+from concurrent.futures import ThreadPoolExecutor
+from alive_progress import alive_bar
 
 DATABASE_PATH = "stock_market_research.db"
+FOLDER_PATH = "./data/images"
 
 
-# Folder name
-folder_path = "./data/images"
+def get_all_trades(cursor):
+    cursor.execute("SELECT * FROM trades")
+    return cursor.fetchall()
 
 
-def get_distinct_symbols(cursor):
-    cursor.execute("SELECT DISTINCT symbol FROM trades")
-    return [row[0] for row in cursor.fetchall()]
-
-
-def get_daily_data_for_symbol(cursor, symbol):
-    cursor.execute("SELECT daily FROM stock_data WHERE symbol = ?", (symbol,))
-    daily_data = cursor.fetchone()[0]
-    return json.loads(daily_data)
+def get_all_daily_data(cursor):
+    cursor.execute("SELECT symbol, daily FROM stock_data where daily is not null")
+    daily_data = {}
+    for row in cursor.fetchall():
+        symbol, data = row
+        daily_data[symbol] = json.loads(data)
+    return daily_data
 
 
 def get_past_200_candles_before_entry(daily_data, entry_date):
@@ -41,38 +41,43 @@ def get_past_200_candles_before_entry(daily_data, entry_date):
     return daily_data[max(0, index - 200) : index]
 
 
-def process_symbol(symbol, cursor):
-    # Get daily data for the symbol from the stock_data table
-    daily_data = get_daily_data_for_symbol(cursor, symbol)
+def process_trade(trade, daily_data):
+    # Get the entry_date of the trade
+    id = trade[0]
+    symbol = trade[1]
+    entry_date = trade[2]
 
-    # Get all trades for the symbol
-    cursor.execute("SELECT * FROM trades WHERE symbol = ?", (symbol,))
-    trades = cursor.fetchall()
+    # Get the past 200 candles before the entry date of the trade
+    past_200_candles = get_past_200_candles_before_entry(daily_data[symbol], entry_date)
 
-    for trade in trades:
-        # Get the entry_date of the trade
-        id = trade[0]
-        symbol = trade[1]
-        entry_date = trade[2]
-
-        # Get the past 200 candles before the entry date of the trade
-        past_200_candles = get_past_200_candles_before_entry(daily_data, entry_date)
-
-        # Continue processing the candles
-        plot_and_save_chart(folder_path, symbol, id, past_200_candles)
+    # Continue processing the candles
+    plot_and_save_chart(FOLDER_PATH, symbol, id, past_200_candles)
 
 
 def main():
-    # Get all distinct symbols from the trades table
+    # Connect to your SQLite database
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
-    symbols = get_distinct_symbols(cursor)
+    # Get all trades
+    print("Getting all trades...")
+    trades = get_all_trades(cursor)
 
-    with alive_bar(len(symbols), title="Plotting stock charts") as bar:
-        for symbol in symbols:
-            process_symbol(symbol, cursor)
-            bar()
+    # Get all daily data at once
+    print("Getting all daily data (this may take a moment) ...")
+    all_daily_data = get_all_daily_data(cursor)
+
+    # Use ThreadPoolExecutor to manage workers
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        with alive_bar(len(trades), title="Processing trades") as bar:
+            futures = [
+                executor.submit(process_trade, trade, all_daily_data)
+                for trade in trades
+            ]
+
+            for future in futures:
+                future.result()
+                bar()
 
     # Close the main database connection
     conn.close()
