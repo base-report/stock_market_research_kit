@@ -5,3 +5,7 @@ flake8
 mypy
 python-dotenv
 alive-progress
+numpy
+pandas
+mplfinance
+Pillow
