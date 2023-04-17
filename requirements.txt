@@ -9,3 +9,4 @@ numpy
 pandas
 mplfinance
 Pillow
+scikit-learn
