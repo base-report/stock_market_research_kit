@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from sklearn.random_projection import GaussianRandomProjection
 from PIL import Image
 
 
@@ -26,9 +27,13 @@ def get_cluster_assignments(images_folder_path, n_clusters):
     scaler = StandardScaler()
     images = scaler.fit_transform(images)
 
-    # Reduce the dimensionality of the data
+    # Apply random projection before PCA
+    reducer = GaussianRandomProjection(n_components=100)
+    images_reduced = reducer.fit_transform(images)
+
+    # Apply PCA on the reduced dataset
     pca = PCA(n_components=0.95)
-    images = pca.fit_transform(images)
+    images = pca.fit_transform(images_reduced)
 
     # Cluster the data
     kmeans = KMeans(n_clusters=n_clusters, random_state=0)

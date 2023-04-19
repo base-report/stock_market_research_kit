@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from alive_progress import alive_bar
 
 DATABASE_PATH = "stock_market_research.db"
-FOLDER_PATH = "./data/images"
+FOLDER_PATH = "./data/images/all"
 
 
 def get_all_trades(cursor):

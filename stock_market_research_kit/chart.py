@@ -10,9 +10,6 @@ matplotlib.use("Agg")
 
 
 def plot_and_save_chart(folder_path, symbol, id, candles):
-    if len(candles) < 200:
-        return
-
     # Prepare the data
     daily = pd.DataFrame(
         np.row_stack(candles),

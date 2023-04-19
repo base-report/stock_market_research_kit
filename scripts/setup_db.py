@@ -51,6 +51,16 @@ def create_trades_table(conn: Connection) -> None:
     conn.commit()
 
 
+def add_cluster_column_to_trades_table(conn: Connection) -> None:
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        ALTER TABLE trades ADD COLUMN cluster INTEGER;
+        """
+    )
+    conn.commit()
+
+
 def main():
     db_name = "stock_market_research.db"
     conn = create_database(db_name)
