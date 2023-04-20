@@ -5,7 +5,7 @@ from skimage import io
 from skimage import exposure
 
 
-def increase_contrast_scikit_image(image, gamma=2.0):
+def increase_contrast_scikit_image(image, gamma=2.3):
     # Adjust gamma to control the level of contrast enhancement
     contrast_image = exposure.adjust_gamma(image, gamma)
 
