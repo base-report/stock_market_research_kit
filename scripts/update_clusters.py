@@ -13,7 +13,7 @@ from stock_market_research_kit.cluster import get_cluster_assignments
 
 
 DATABASE_PATH = "stock_market_research.db"
-N_CLUSTERS = 20
+N_CLUSTERS = 5
 FOLDER_PATH = "./data/images"
 
 images_folder_path = FOLDER_PATH + "/all"
@@ -84,9 +84,14 @@ def copy_images_to_clusters():
         if file.endswith(".png"):
             file_path = os.path.join(images_folder_path, file)
             file_id = int(file.split("__")[-1].split(".")[0])
-            cluster_label = cluster_data[file_id]
-            destination_folder = os.path.join(clusters_folder_path, str(cluster_label))
-            shutil.copy(file_path, destination_folder)
+
+            # Check if the file_id exists in cluster_data
+            if file_id in cluster_data:
+                cluster_label = cluster_data[file_id]
+                destination_folder = os.path.join(
+                    clusters_folder_path, str(cluster_label)
+                )
+                shutil.copy(file_path, destination_folder)
 
 
 def main():
