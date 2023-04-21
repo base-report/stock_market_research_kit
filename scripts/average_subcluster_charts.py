@@ -13,15 +13,20 @@ from alive_progress import alive_bar
 CLUSTERS_FOLDER = "./data/images/clusters/"
 AVERAGES_PATH = "./data/images/averages/"
 
+N_SUBCLUSTERS = 2
+
 
 def main():
     clusters = get_all_clusters()
-    with alive_bar(len(clusters), title="Averaging clusters") as bar:
+    with alive_bar(len(clusters) * N_SUBCLUSTERS, title="Averaging subclusters") as bar:
         for cluster in clusters:
-            images_folder = CLUSTERS_FOLDER + str(cluster)
-            output_path = AVERAGES_PATH + str(cluster) + ".png"
-            average_images(images_folder, output_path)
-            bar()
+            for subcluster in range(N_SUBCLUSTERS):
+                images_folder = CLUSTERS_FOLDER + str(cluster) + "/" + str(subcluster)
+                output_path = (
+                    AVERAGES_PATH + str(cluster) + "_" + str(subcluster) + ".png"
+                )
+                average_images(images_folder, output_path)
+                bar()
 
 
 if __name__ == "__main__":

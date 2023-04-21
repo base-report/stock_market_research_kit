@@ -34,10 +34,6 @@ def update_clusters():
     # Update the `trades` table with the cluster labels in a single transaction
     cursor.executemany("UPDATE trades SET cluster = ? WHERE id = ?", update_data)
 
-    cursor.execute(
-        "SELECT id, symbol, entry_date, cluster, CAST(cluster AS TEXT) as cluster_text FROM trades WHERE cluster = 1 LIMIT 10;"
-    )
-
     # Commit the changes and close the database connection
     conn.commit()
     conn.close()
