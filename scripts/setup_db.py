@@ -51,10 +51,33 @@ def create_trades_table(conn: Connection) -> None:
     conn.commit()
 
 
+def add_cluster_column_to_trades_table(conn: Connection) -> None:
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        ALTER TABLE trades ADD COLUMN cluster INTEGER;
+        """
+    )
+    conn.commit()
+
+
+def add_subcluster_column_to_trades_table(conn: Connection) -> None:
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        ALTER TABLE trades ADD COLUMN subcluster INTEGER;
+        """
+    )
+    conn.commit()
+
+
 def main():
     db_name = "stock_market_research.db"
     conn = create_database(db_name)
     create_stock_data_table(conn)
+    create_trades_table(conn)
+    add_cluster_column_to_trades_table(conn)
+    add_subcluster_column_to_trades_table(conn)
     print("Database created successfully")
     conn.close()
 

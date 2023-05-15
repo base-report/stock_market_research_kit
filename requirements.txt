@@ -1,7 +1,15 @@
+# you may need to run conda config --add channels conda-forge before installing
 requests
 black
 isort
-flake8
+ruff
 mypy
 python-dotenv
 alive-progress
+numpy
+pandas
+mplfinance
+Pillow
+scikit-learn
+scikit-image
+openblas
