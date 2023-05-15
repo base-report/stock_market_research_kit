@@ -123,6 +123,46 @@ python scripts/plot_stock_charts.py
 
 _Please note that this loads all of the timeseries data into memory and uses 10 background workers to process the trades in parallel. This steps takes ~20 minutes to complete. Feel free to adjust the number of workers in `plot_stock_charts.py` to your machine's capabilities._
 
+### Cluster images
+
+To cluster the stock charts into different clusters based on visual appearance, run the `update_clusters.py` script:
+
+```bash
+python scripts/update_clusters.py
+```
+
+_This step takes ~70 minutes. The clustering uses `MiniBatchKMeans` and 20% training size. Change the `N_CLUSTERS` variable to experiment with different numbers of clusters. After completion, the `trades` table should have its `cluster` column updated. You should also find folders for each cluster under `data/images/clusters/`._
+
+### Average cluster images
+
+To get an average image of each cluster, run the `average_cluster_charts.py` script:
+
+```bash
+python scripts/average_cluster_charts.py
+```
+
+_This steps takes ~17 seconds. After complettion, you should find the images under `data/images/averages/`._
+
+### Subcluster images
+
+To divide each cluster into additional subclusters, run the `update_subclusters.py` script:
+
+```bash
+python scripts/update_subclusters.py
+```
+
+_This step takes ~6.5 minutes. Change the `N_SUBCLUSTERS` variable to experiment with different numbers of subclusters. After completion, the `trades` table should have its `subcluster` column updated. You should also find folders for each subcluster under `data/images/clusters/<CLUSTER>/`._
+
+### Average subcluster images
+
+To get an average image of each subcluster, run the `average_subcluster_charts.py` script:
+
+```bash
+python scripts/average_subcluster_charts.py
+```
+
+_This steps takes ~20 seconds. After complettion, you should find the images under `data/images/averages/`._
+
 ## Contributing
 
 Contributions to the Stock Market Research Kit are welcome. If you have ideas for improvements or new features, please open an issue on GitHub or submit a pull request with your proposed changes.
